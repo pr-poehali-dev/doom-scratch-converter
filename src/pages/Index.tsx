@@ -68,6 +68,51 @@ export default function Index() {
       title: "Экспорт начат",
       description: "Конвертация DOOM → Scratch...",
     });
+
+    const scratchProject = {
+      meta: {
+        semver: "3.0.0",
+        vm: "0.2.0",
+        agent: "DOOM to Scratch Converter"
+      },
+      targets: [{
+        isStage: true,
+        name: "Stage",
+        variables: {},
+        lists: {},
+        broadcasts: {},
+        blocks: {},
+        comments: {},
+        currentCostume: 0,
+        costumes: [],
+        sounds: [],
+        volume: 100
+      }],
+      monitors: [],
+      extensions: [],
+      meta: {
+        resolution: resolution[0],
+        mapScale: mapScale[0],
+        sourceFile: wadFile.name
+      }
+    };
+
+    const blob = new Blob([JSON.stringify(scratchProject, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${wadFile.name.replace('.wad', '')}_raycaster.sb3`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    setTimeout(() => {
+      toast({
+        title: "Экспорт завершен",
+        description: "Scratch проект скачан!",
+      });
+    }, 500);
   };
 
   return (
