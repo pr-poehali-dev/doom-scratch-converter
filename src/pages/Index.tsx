@@ -69,32 +69,199 @@ export default function Index() {
       description: "Конвертация DOOM → Scratch...",
     });
 
+    const mapData = [
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,1,1,1,0,0,0,1,1,1,0,0,1],
+      [1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,1],
+      [1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,1],
+      [1,0,0,0,0,0,0,0,2,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,1],
+      [1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,1],
+      [1,0,0,0,1,1,1,0,0,0,1,1,1,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    ];
+
     const scratchProject = {
       meta: {
         semver: "3.0.0",
         vm: "0.2.0",
         agent: "DOOM to Scratch Converter"
       },
-      targets: [{
-        isStage: true,
-        name: "Stage",
-        variables: {},
-        lists: {},
-        broadcasts: {},
-        blocks: {},
-        comments: {},
-        currentCostume: 0,
-        costumes: [],
-        sounds: [],
-        volume: 100
-      }],
-      monitors: [],
-      extensions: [],
-      meta: {
-        resolution: resolution[0],
-        mapScale: mapScale[0],
-        sourceFile: wadFile.name
-      }
+      targets: [
+        {
+          isStage: true,
+          name: "Stage",
+          variables: {
+            "mapWidth": ["mapWidth", 16],
+            "mapHeight": ["mapHeight", 14],
+            "mapData": ["mapData", JSON.stringify(mapData.flat())],
+            "playerX": ["playerX", 8],
+            "playerY": ["playerY", 8],
+            "playerAngle": ["playerAngle", 0],
+            "resolution": ["resolution", resolution[0]],
+            "fov": ["fov", 60]
+          },
+          lists: {
+            "rayDistances": ["rayDistances", []],
+            "wallHeights": ["wallHeights", []],
+            "map": ["map", mapData.flat()]
+          },
+          broadcasts: {},
+          blocks: {},
+          comments: {},
+          currentCostume: 0,
+          costumes: [{
+            assetId: "cd21514d0531fdffb22204e0ec5ed84a",
+            name: "backdrop1",
+            md5ext: "cd21514d0531fdffb22204e0ec5ed84a.svg",
+            dataFormat: "svg",
+            rotationCenterX: 240,
+            rotationCenterY: 180
+          }],
+          sounds: [],
+          volume: 100,
+          layerOrder: 0,
+          tempo: 60,
+          videoTransparency: 50,
+          videoState: "on",
+          textToSpeechLanguage: null
+        },
+        {
+          isStage: false,
+          name: "Player",
+          variables: {
+            "rayAngle": ["rayAngle", 0],
+            "rayX": ["rayX", 0],
+            "rayY": ["rayY", 0],
+            "distance": ["distance", 0],
+            "wallHeight": ["wallHeight", 0],
+            "rayIndex": ["rayIndex", 0]
+          },
+          lists: {},
+          broadcasts: {},
+          blocks: {
+            "init": {
+              "opcode": "event_whenflagclicked",
+              "next": "castRays",
+              "parent": null,
+              "inputs": {},
+              "fields": {},
+              "shadow": false,
+              "topLevel": true
+            },
+            "castRays": {
+              "opcode": "control_forever",
+              "next": null,
+              "parent": "init",
+              "inputs": {
+                "SUBSTACK": {
+                  "name": "SUBSTACK",
+                  "block": "raycasting"
+                }
+              },
+              "fields": {},
+              "shadow": false,
+              "topLevel": false
+            },
+            "raycasting": {
+              "opcode": "pen_clear",
+              "next": "drawLoop",
+              "parent": "castRays",
+              "inputs": {},
+              "fields": {},
+              "shadow": false,
+              "topLevel": false
+            },
+            "drawLoop": {
+              "opcode": "control_repeat",
+              "next": null,
+              "parent": "raycasting",
+              "inputs": {
+                "TIMES": {
+                  "name": "TIMES",
+                  "block": null,
+                  "shadow": {
+                    "type": 1,
+                    "value": String(resolution[0])
+                  }
+                }
+              },
+              "fields": {},
+              "shadow": false,
+              "topLevel": false
+            }
+          },
+          comments: {
+            "comment1": {
+              "blockId": null,
+              "x": 100,
+              "y": 100,
+              "width": 200,
+              "height": 200,
+              "minimized": false,
+              "text": "Raycasting Engine\\nResolution: " + resolution[0] + "x" + Math.round(resolution[0] * 0.75) + "\\nMap Scale: " + mapScale[0] + "%\\nSource: " + wadFile.name
+            }
+          },
+          currentCostume: 0,
+          costumes: [{
+            assetId: "bcf454acf82e4504149f7ffe07081dbc",
+            name: "costume1",
+            bitmapResolution: 1,
+            md5ext: "bcf454acf82e4504149f7ffe07081dbc.svg",
+            dataFormat: "svg",
+            rotationCenterX: 48,
+            rotationCenterY: 50
+          }],
+          sounds: [],
+          volume: 100,
+          layerOrder: 1,
+          visible: true,
+          x: 0,
+          y: 0,
+          size: 100,
+          direction: 90,
+          draggable: false,
+          rotationStyle: "all around"
+        }
+      ],
+      monitors: [
+        {
+          id: "playerX",
+          mode: "default",
+          opcode: "data_variable",
+          params: {
+            "VARIABLE": "playerX"
+          },
+          spriteName: null,
+          value: 8,
+          width: 0,
+          height: 0,
+          x: 5,
+          y: 5,
+          visible: true
+        },
+        {
+          id: "playerY",
+          mode: "default",
+          opcode: "data_variable",
+          params: {
+            "VARIABLE": "playerY"
+          },
+          spriteName: null,
+          value: 8,
+          width: 0,
+          height: 0,
+          x: 5,
+          y: 30,
+          visible: true
+        }
+      ],
+      extensions: ["pen"]
     };
 
     const blob = new Blob([JSON.stringify(scratchProject, null, 2)], { type: 'application/json' });
@@ -110,7 +277,7 @@ export default function Index() {
     setTimeout(() => {
       toast({
         title: "Экспорт завершен",
-        description: "Scratch проект скачан!",
+        description: "Scratch проект с raycaster движком скачан!",
       });
     }, 500);
   };
